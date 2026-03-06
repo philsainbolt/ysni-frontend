@@ -1,101 +1,113 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { challengeAPI } from '../services/api';
+import React, { useMemo, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { CHALLENGES } from '../data/challenges';
+import { challengeAPI, progressAPI } from '../services/api';
+import { readLocalProgress, saveLocalProgress } from '../services/progress';
 
 export default function ChallengePage() {
   const { id } = useParams();
-  const navigate = useNavigate();
-  const [challenge, setChallenge] = useState(null);
-  const [userInput, setUserInput] = useState('');
-  const [response, setResponse] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const challenge = useMemo(() => CHALLENGES.find((item) => item.id === id), [id]);
+  const [prompt, setPrompt] = useState('');
+  const [response, setResponse] = useState('');
+  const [passed, setPassed] = useState(null);
+  const [hint, setHint] = useState('');
   const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    const fetchChallenge = async () => {
-      try {
-        const res = await challengeAPI.getById(id);
-        setChallenge(res.data);
-      } catch (err) {
-        setError('Failed to load challenge');
-      }
-    };
+  if (!challenge) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-slate-100 p-6">
+        <p>Challenge not found.</p>
+        <Link to="/" className="text-cyan-400">Return to levels</Link>
+      </div>
+    );
+  }
 
-    fetchChallenge();
-  }, [id]);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
+  const markComplete = async () => {
+    const local = readLocalProgress().map(String);
+    if (!local.includes(challenge.id)) {
+      const updated = [...local, challenge.id].sort((a, b) => Number(a) - Number(b));
+      saveLocalProgress(updated);
+    }
 
     try {
-      const res = await challengeAPI.submit(id, userInput);
-      setResponse(res.data);
-    } catch (err) {
-      setError(err.response?.data?.error || 'Submission failed');
-    } finally {
-      setLoading(false);
+      await progressAPI.beat(challenge.id);
+    } catch {
+      setError('Challenge passed, but backend progress sync failed. Saved locally.');
     }
   };
 
-  if (error && !challenge) {
-    return <div className="text-red-500 p-8">{error}</div>;
-  }
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setSubmitting(true);
+    setError('');
 
-  if (!challenge) {
-    return <div className="p-8">Loading...</div>;
-  }
+    try {
+      const result = await challengeAPI.submit(challenge.id, prompt);
+      const data = result.data || {};
+      setResponse(data.response || data.output || 'No model response returned.');
+      setPassed(Boolean(data.pass || data.success));
+      setHint(data.hint || '');
+
+      if (data.pass || data.success) {
+        await markComplete();
+      }
+    } catch {
+      setError('Unable to reach backend. Start backend server and try again.');
+      setPassed(false);
+      setHint('No verdict available while offline.');
+      setResponse('');
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="text-blue-600 hover:text-blue-800"
-          >
-            ← Back to Dashboard
-          </button>
-        </div>
-      </nav>
+    <div className="min-h-screen bg-slate-950 text-slate-100 px-6 py-10">
+      <main className="mx-auto max-w-4xl space-y-6">
+        <Link to="/" className="text-cyan-400 hover:text-cyan-300">← Back to levels</Link>
 
-      <main className="max-w-4xl mx-auto px-6 py-12">
-        <h1 className="text-3xl font-bold mb-4">{challenge.title}</h1>
-        <p className="text-gray-600 mb-8">{challenge.description}</p>
+        <section className="border border-cyan-500/30 bg-slate-900/80 rounded-lg p-6">
+          <h1 className="text-3xl font-bold font-mono">{challenge.title}</h1>
+          <p className="mt-3 text-slate-300">{challenge.description}</p>
+          <p className="mt-3 text-cyan-200"><span className="font-semibold">Objective:</span> {challenge.objective}</p>
+          <p className="mt-2 text-slate-400"><span className="font-semibold">Hint:</span> {challenge.hint}</p>
+        </section>
 
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl font-bold mb-4">Challenge Details</h2>
-          <p className="text-gray-700 mb-4">{challenge.explanation}</p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-6">
-          <label className="block text-lg font-semibold mb-2">Your Input:</label>
+        <form onSubmit={handleSubmit} className="border border-slate-700 bg-slate-900 rounded-lg p-6">
+          <label htmlFor="prompt" className="block mb-2 font-semibold">Prompt Payload</label>
           <textarea
-            value={userInput}
-            onChange={(e) => setUserInput(e.target.value)}
-            className="w-full h-32 px-4 py-2 border border-gray-300 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter your prompt injection attempt..."
+            id="prompt"
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            className="w-full h-40 p-3 bg-slate-950 border border-slate-700 rounded focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            placeholder="Craft your injection prompt..."
             required
           />
-
-          {error && <div className="p-4 bg-red-100 text-red-700 rounded mb-4">{error}</div>}
-
-          {response && (
-            <div className={`p-4 rounded mb-4 ${response.success ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
-              <p className="font-bold">{response.success ? 'Success! 🎉' : 'Not quite...'}</p>
-              <p>{response.hint}</p>
-            </div>
-          )}
-
           <button
             type="submit"
-            disabled={loading}
-            className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 disabled:opacity-50"
+            disabled={submitting}
+            className="mt-4 px-5 py-2 bg-cyan-500 text-slate-950 font-semibold rounded hover:bg-cyan-400 disabled:opacity-60"
           >
-            {loading ? 'Submitting...' : 'Submit'}
+            {submitting ? 'Executing...' : 'Run Attack'}
           </button>
         </form>
+
+        {error && <div className="p-4 border border-amber-500/40 bg-amber-500/10 text-amber-200 rounded">{error}</div>}
+
+        <section className="border border-slate-700 bg-slate-900 rounded-lg p-6">
+          <h2 className="text-xl font-semibold font-mono mb-3">LLM Response</h2>
+          <div className="bg-slate-950 border border-slate-800 rounded p-4 min-h-[120px] text-slate-200 whitespace-pre-wrap">
+            {response || 'No response yet.'}
+          </div>
+
+          {passed !== null && (
+            <div className={`mt-4 p-3 rounded border ${passed ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-300' : 'border-rose-500/40 bg-rose-500/10 text-rose-300'}`}>
+              <p className="font-semibold">{passed ? 'PASS' : 'FAIL'}</p>
+              {hint && <p className="mt-1 text-sm">{hint}</p>}
+            </div>
+          )}
+        </section>
       </main>
     </div>
   );
