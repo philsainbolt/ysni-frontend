@@ -37,7 +37,7 @@ export default function SignupForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4" data-testid="signup-form">
       {error && <div className="p-4 bg-red-100 text-red-700 rounded">{error}</div>}
       <input
         type="text"

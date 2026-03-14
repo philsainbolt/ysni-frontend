@@ -28,7 +28,7 @@ export default function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4" data-testid="login-form">
       {error && <div className="p-4 bg-red-100 text-red-700 rounded">{error}</div>}
       <input
         type="email"

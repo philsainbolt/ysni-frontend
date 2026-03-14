@@ -74,10 +74,11 @@ export default function ChallengePage() {
           <p className="mt-2 text-slate-400"><span className="font-semibold">Hint:</span> {challenge.hint}</p>
         </section>
 
-        <form onSubmit={handleSubmit} className="border border-slate-700 bg-slate-900 rounded-lg p-6">
+        <form onSubmit={handleSubmit} className="border border-slate-700 bg-slate-900 rounded-lg p-6" data-testid="challenge-form">
           <label htmlFor="prompt" className="block mb-2 font-semibold">Prompt Payload</label>
           <textarea
             id="prompt"
+            data-testid="challenge-prompt-input"
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             className="w-full h-40 p-3 bg-slate-950 border border-slate-700 rounded focus:outline-none focus:ring-2 focus:ring-cyan-500"
@@ -86,6 +87,7 @@ export default function ChallengePage() {
           />
           <button
             type="submit"
+            data-testid="challenge-submit-button"
             disabled={submitting}
             className="mt-4 px-5 py-2 bg-cyan-500 text-slate-950 font-semibold rounded hover:bg-cyan-400 disabled:opacity-60"
           >
@@ -102,7 +104,10 @@ export default function ChallengePage() {
           </div>
 
           {passed !== null && (
-            <div className={`mt-4 p-3 rounded border ${passed ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-300' : 'border-rose-500/40 bg-rose-500/10 text-rose-300'}`}>
+            <div
+              data-testid={passed ? 'challenge-success-indicator' : 'challenge-failure-indicator'}
+              className={`mt-4 p-3 rounded border ${passed ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-300' : 'border-rose-500/40 bg-rose-500/10 text-rose-300'}`}
+            >
               <p className="font-semibold">{passed ? 'PASS' : 'FAIL'}</p>
               {hint && <p className="mt-1 text-sm">{hint}</p>}
             </div>

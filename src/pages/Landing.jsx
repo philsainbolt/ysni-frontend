@@ -55,12 +55,14 @@ export default function Landing() {
             return (
               <article
                 key={challenge.id}
+                data-testid={`level-card-${challenge.id}`}
                 className="border rounded-lg p-5 bg-slate-900/70 border-slate-700 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
               >
                 <div>
                   <div className="flex items-center gap-3 mb-2">
                     <h2 className="text-xl font-semibold font-mono">{challenge.title}</h2>
                     <span
+                      data-testid={`level-status-${challenge.id}`}
                       className={`text-xs px-2 py-1 rounded-full font-semibold ${
                         beaten
                           ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
@@ -77,6 +79,7 @@ export default function Landing() {
                 {unlocked ? (
                   <Link
                     to={`/challenge/${challenge.id}`}
+                    data-testid={`enter-level-${challenge.id}`}
                     className="inline-flex justify-center items-center px-4 py-2 bg-cyan-500 text-slate-950 rounded font-semibold hover:bg-cyan-400 transition"
                   >
                     Enter Level
