@@ -10,9 +10,9 @@ export function useChallenges() {
     const fetchChallenges = async () => {
       try {
         const response = await challengeAPI.getAll();
-        setChallenges(response.data);
+        setChallenges(response.data || []);
       } catch (err) {
-        setError(err.message);
+        setError(err.response?.data?.error || err.message);
       } finally {
         setLoading(false);
       }

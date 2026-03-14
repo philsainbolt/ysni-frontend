@@ -1,41 +1,32 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { CHALLENGES } from '../data/challenges';
-import { challengeAPI, progressAPI } from '../services/api';
-import { readLocalProgress, saveLocalProgress } from '../services/progress';
+import { challengeAPI } from '../services/api';
 
 export default function ChallengePage() {
   const { id } = useParams();
-  const challenge = useMemo(() => CHALLENGES.find((item) => item.id === id), [id]);
+  const [challenge, setChallenge] = useState(null);
   const [prompt, setPrompt] = useState('');
   const [response, setResponse] = useState('');
   const [passed, setPassed] = useState(null);
   const [hint, setHint] = useState('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  if (!challenge) {
-    return (
-      <div className="min-h-screen bg-slate-950 text-slate-100 p-6">
-        <p>Challenge not found.</p>
-        <Link to="/" className="text-cyan-400">Return to levels</Link>
-      </div>
-    );
-  }
+  useEffect(() => {
+    const loadChallenge = async () => {
+      try {
+        const res = await challengeAPI.getById(id);
+        setChallenge(res.data);
+      } catch {
+        setError('Challenge not found or unavailable.');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const markComplete = async () => {
-    const local = readLocalProgress().map(String);
-    if (!local.includes(challenge.id)) {
-      const updated = [...local, challenge.id].sort((a, b) => Number(a) - Number(b));
-      saveLocalProgress(updated);
-    }
-
-    try {
-      await progressAPI.beat(challenge.id);
-    } catch {
-      setError('Challenge passed, but backend progress sync failed. Saved locally.');
-    }
-  };
+    loadChallenge();
+  }, [id]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -43,35 +34,42 @@ export default function ChallengePage() {
     setError('');
 
     try {
-      const result = await challengeAPI.submit(challenge.id, prompt);
+      const result = await challengeAPI.submit(id, prompt);
       const data = result.data || {};
-      setResponse(data.response || data.output || 'No model response returned.');
+      setResponse(data.response || 'No model response returned.');
       setPassed(Boolean(data.pass || data.success));
       setHint(data.hint || '');
-
-      if (data.pass || data.success) {
-        await markComplete();
-      }
     } catch {
-      setError('Unable to reach backend. Start backend server and try again.');
+      setError('Unable to submit prompt.');
       setPassed(false);
-      setHint('No verdict available while offline.');
       setResponse('');
+      setHint('No verdict available.');
     } finally {
       setSubmitting(false);
     }
   };
 
+  if (loading) {
+    return <div className="min-h-screen bg-slate-950 text-slate-100 p-6">Loading challenge...</div>;
+  }
+
+  if (!challenge) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-slate-100 p-6">
+        <p>{error || 'Challenge not found.'}</p>
+        <Link to="/dashboard" className="text-cyan-400">Return to dashboard</Link>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 px-6 py-10">
       <main className="mx-auto max-w-4xl space-y-6">
-        <Link to="/" className="text-cyan-400 hover:text-cyan-300">← Back to levels</Link>
+        <Link to="/dashboard" className="text-cyan-400 hover:text-cyan-300">← Back to levels</Link>
 
         <section className="border border-cyan-500/30 bg-slate-900/80 rounded-lg p-6">
           <h1 className="text-3xl font-bold font-mono">{challenge.title}</h1>
           <p className="mt-3 text-slate-300">{challenge.description}</p>
-          <p className="mt-3 text-cyan-200"><span className="font-semibold">Objective:</span> {challenge.objective}</p>
-          <p className="mt-2 text-slate-400"><span className="font-semibold">Hint:</span> {challenge.hint}</p>
         </section>
 
         <form onSubmit={handleSubmit} className="border border-slate-700 bg-slate-900 rounded-lg p-6" data-testid="challenge-form">

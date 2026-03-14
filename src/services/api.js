@@ -7,16 +7,32 @@ export const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+export const authAPI = {
+  register: (username, email, password) =>
+    api.post('/api/auth/register', { username, email, password }),
+  login: (email, password) => api.post('/api/auth/login', { email, password }),
+  profile: () => api.get('/api/users/profile'),
+};
+
 export const progressAPI = {
   get: () => api.get('/api/progress'),
   beat: (id) => api.post(`/api/progress/beat/${id}`),
 };
 
 export const challengeAPI = {
+  getAll: () => api.get('/api/challenges'),
+  getById: (id) => api.get(`/api/challenges/${id}`),
   submit: (id, userPrompt) =>
     api.post(`/api/challenges/${id}/submit`, {
       userPrompt,
-      // Keep legacy key for backward compatibility with older backend builds.
       prompt: userPrompt,
     }),
 };
