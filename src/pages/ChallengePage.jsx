@@ -35,14 +35,14 @@ export default function ChallengePage() {
   };
 
   if (loading) {
-    return <div className="min-h-screen bg-slate-950 text-slate-100 p-6">Loading challenge...</div>;
+    return <div className="min-h-screen bg-[#0a0505] text-[#a89878] p-8 font-body">The path unfolds...</div>;
   }
 
   if (!challenge) {
     return (
-      <div className="min-h-screen bg-slate-950 text-slate-100 p-6">
+      <div className="min-h-screen bg-[#0a0505] text-rose-400 p-8 font-body">
         <p>{error || 'Challenge not found.'}</p>
-        <Link to="/dashboard" className="text-cyan-400">Return to dashboard</Link>
+        <Link to="/dashboard" className="text-[#d4a843] hover:text-[#e8c547] font-body">Return to dashboard</Link>
       </div>
     );
   }

@@ -1,21 +1,56 @@
 import { Link } from 'react-router-dom';
+import { getTheme } from '../config/levelThemes';
 
 export default function ChallengeCard({ challenge, locked = false }) {
+  const theme = getTheme(challenge.level || challenge.id);
+
   return (
-    <div className={`border rounded-lg p-6 transition ${locked ? 'border-slate-700 bg-slate-800 opacity-60' : 'border-slate-700 hover:border-cyan-500/50 bg-slate-900'}`}>
-      <h3 className="text-xl font-bold mb-2 text-slate-100">{challenge.title}</h3>
-      <p className="text-slate-300 mb-4">{challenge.description}</p>
+    <div
+      className={
+        locked
+          ? 'border border-[#3d2d2d] bg-[#1a1210] opacity-40 rounded-lg p-6 transition'
+          : 'border rounded-lg p-6 transition hover:shadow-lg'
+      }
+      style={
+        locked
+          ? undefined
+          : {
+              borderColor: theme.colors.border,
+              backgroundColor: theme.colors.surface + 'cc',
+            }
+      }
+    >
+      <h3
+        className="text-xl font-medieval mb-2"
+        style={{ color: locked ? '#6b5040' : theme.colors.text }}
+      >
+        {challenge.title}
+      </h3>
+      <p
+        className="font-body mb-4"
+        style={{ color: locked ? '#4a3a2a' : theme.colors.muted }}
+      >
+        {challenge.description}
+      </p>
       <div className="flex justify-between items-center">
-        <span className="px-3 py-1 rounded-full text-sm font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
+        <span
+          className="px-3 py-1 rounded-full text-sm font-semibold border"
+          style={{
+            color: locked ? '#6b5040' : theme.colors.primary,
+            borderColor: locked ? '#3d2d2d' : theme.colors.primary + '4d',
+            backgroundColor: locked ? 'transparent' : theme.colors.primary + '1a',
+          }}
+        >
           Level {challenge.level || challenge.id}
         </span>
 
         {locked ? (
-          <button disabled className="bg-slate-700 text-slate-400 px-4 py-2 rounded cursor-not-allowed">Locked</button>
+          <button disabled className="bg-[#2a2020] text-[#6b5040] px-4 py-2 rounded-lg cursor-not-allowed font-medieval">Locked</button>
         ) : (
           <Link
             to={`/challenge/${challenge._id || challenge.id}`}
-            className="bg-cyan-500 text-slate-950 px-4 py-2 rounded font-semibold hover:bg-cyan-400"
+            className="px-4 py-2 rounded-lg font-medieval font-semibold transition-colors"
+            style={{ backgroundColor: theme.colors.primary, color: theme.colors.bg }}
           >
             Start
           </Link>

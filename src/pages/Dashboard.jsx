@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import NavBar from '../components/NavBar';
-import ChallengeCard from '../components/ChallengeCard';
+import JourneyMap from '../components/JourneyMap';
 import { useAuth } from '../hooks/useAuth';
 import { progressAPI, challengeAPI } from '../services/api';
-import { isLevelUnlocked } from '../services/progress';
 
 export default function Dashboard() {
   const { logout } = useAuth();
@@ -43,33 +42,35 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100">
+    <div
+      className="min-h-screen text-[#f0d0b0]"
+      style={{ background: 'linear-gradient(to top, #0f1f0f 0%, #131320 25%, #151210 50%, #0d0f0a 75%, #0a0000 95%, #050005 100%)' }}
+    >
       <NavBar>
-        <Link to="/profile" className="text-slate-300 hover:text-cyan-400">
+        <Link to="/profile" className="text-[#d4a843] hover:text-[#e8c547] font-body">
           Profile
         </Link>
         <button
           onClick={handleLogout}
-          className="bg-rose-500 text-white px-4 py-2 rounded hover:bg-rose-600"
+          className="bg-[#5a1a0a] text-[#f0d0b0] px-4 py-2 rounded-lg hover:bg-[#8b1a00] font-medieval transition-colors"
         >
           Logout
         </button>
       </NavBar>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
-        <h2 className="text-3xl font-bold mb-8">Available Challenges</h2>
+        <h2 className="text-3xl font-display text-[#d4a843] mb-2 text-center">The Journey Awaits</h2>
+        <p className="text-[#a89878] text-center font-body mb-8">Five trials stand between you and the Ashen Peak</p>
 
-        {loading && <p className="text-slate-300">Loading challenges...</p>}
+        {loading && <p className="text-[#a89878]">The path unfolds...</p>}
         {error && <p className="text-rose-400">Error loading challenges: {error}</p>}
 
         {!loading && !error && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {challenges.map((challenge) => {
-              const level = challenge.level || challenge.id;
-              const locked = !isLevelUnlocked(level, beatenLevels);
-              return <ChallengeCard key={challenge.id || challenge._id} challenge={challenge} locked={locked} />;
-            })}
-          </div>
+          <JourneyMap
+            challenges={challenges}
+            beatenLevels={beatenLevels}
+            onSelect={(id) => navigate('/challenge/' + id)}
+          />
         )}
       </main>
     </div>

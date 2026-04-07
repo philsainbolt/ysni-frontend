@@ -23,7 +23,7 @@ export default function LoginForm({ onSubmit }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4" data-testid="login-form">
-      {error && <div className="p-4 bg-rose-500/10 text-rose-300 border border-rose-500/40 rounded">{error}</div>}
+      {error && <div className="p-4 bg-rose-500/10 text-rose-300 border border-rose-500/30 rounded-lg font-body">{error}</div>}
       <FormInput
         type="email"
         placeholder="Email"
@@ -41,9 +41,9 @@ export default function LoginForm({ onSubmit }) {
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-cyan-500 text-slate-950 font-semibold py-2 rounded hover:bg-cyan-400 disabled:opacity-50"
+        className="w-full py-2.5 rounded-lg font-medieval text-lg font-semibold bg-gradient-to-r from-[#e84520] to-[#ff6a00] text-white hover:shadow-[0_0_20px_rgba(255,106,0,0.3)] transition-shadow disabled:opacity-50"
       >
-        {loading ? 'Logging in...' : 'Login'}
+        {loading ? 'Signing in...' : 'Sign In'}
       </button>
     </form>
   );

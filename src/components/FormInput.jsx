@@ -6,7 +6,7 @@ export default function FormInput({ type, placeholder, value, onChange, required
       value={value}
       onChange={onChange}
       required={required}
-      className="w-full px-4 py-2 border border-slate-600 bg-slate-900 text-slate-100 placeholder-slate-400 rounded focus:outline-none focus:ring-2 focus:ring-cyan-500"
+      className="w-full px-4 py-2.5 border border-[#3d2d2d] bg-[#0a0505] text-[#f0d0b0] placeholder-[#6b5040] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d4953a] font-body"
       {...rest}
     />
   );

@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=MedievalSharp&family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -9,10 +11,48 @@
 body {
   margin: 0;
   min-height: 100vh;
-  font-family: 'JetBrains Mono', 'Fira Code', 'SFMono-Regular', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
-  background: radial-gradient(circle at 20% 20%, #0f172a 0%, #020617 45%, #020617 100%);
+  font-family: 'Crimson Text', 'Georgia', serif;
+  background: radial-gradient(ellipse at 20% 10%, #1a1210 0%, #0a0505 50%, #050005 100%);
+  color: #f0d0b0;
 }
 
 * {
   box-sizing: border-box;
+}
+
+/* Scrollbar styling for the fantasy theme */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0505;
+}
+::-webkit-scrollbar-thumb {
+  background: #3d2d2d;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #5c4a36;
+}
+
+/* Selection colors */
+::selection {
+  background: rgba(232, 69, 32, 0.3);
+  color: #f0d0b0;
+}
+
+/* Reduced motion: disable all custom animations */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Utility: monospace for code/prompt areas */
+.font-code {
+  font-family: 'JetBrains Mono', 'Fira Code', 'SFMono-Regular', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
 }

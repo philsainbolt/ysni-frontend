@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import ResponseDisplay from './ResponseDisplay';
+import { getTheme } from '../config/levelThemes';
+import EmberParticles from './EmberParticles';
+import LevelBackground from './backgrounds/LevelBackground';
 
 export default function ChallengeWorkspace({ challenge, onSubmit, onGuess }) {
   const [prompt, setPrompt] = useState('');
@@ -14,6 +17,7 @@ export default function ChallengeWorkspace({ challenge, onSubmit, onGuess }) {
   const [guessInput, setGuessInput] = useState('');
   const [guessing, setGuessing] = useState(false);
   const navigate = useNavigate();
+  const theme = getTheme(challenge.level || challenge.id);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -58,23 +62,27 @@ export default function ChallengeWorkspace({ challenge, onSubmit, onGuess }) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 px-4 sm:px-6 py-10">
-      <main className="mx-auto max-w-4xl space-y-6">
-        <Link to="/dashboard" className="text-cyan-400 hover:text-cyan-300">&larr; Back to levels</Link>
+    <div className="min-h-screen px-4 sm:px-6 py-10 relative" style={{ background: theme.gradient, color: theme.colors.text }}>
+      <LevelBackground level={challenge.level || challenge.id} />
+      {theme.particles && <EmberParticles type={theme.particles.type} count={theme.particles.count} colors={theme.particles.colors} />}
+      <main className="mx-auto max-w-4xl space-y-6 relative z-10">
+        <Link to="/dashboard" style={{ color: theme.colors.primary }} className="hover:opacity-80 font-body transition-opacity">&larr; Back to levels</Link>
 
-        <section className="border border-cyan-500/30 bg-slate-900/80 rounded-lg p-6">
-          <h1 className="text-3xl font-bold font-mono">{challenge.title}</h1>
-          <p className="mt-3 text-slate-300">{challenge.description}</p>
+        <section className="rounded-lg p-6" style={{ border: `1px solid ${theme.colors.border}`, backgroundColor: theme.colors.surface + 'cc' }}>
+          <h1 className="text-3xl font-display" style={{ color: theme.colors.accent || theme.colors.primary }}>{challenge.title}</h1>
+          <p className="mt-3 font-body" style={{ color: theme.colors.muted }}>{challenge.description}</p>
+          <p className="mt-4 italic font-body text-sm" style={{ color: theme.colors.muted + '99' }}>{theme.atmosphere}</p>
         </section>
 
-        <form onSubmit={handleSubmit} className="border border-slate-700 bg-slate-900 rounded-lg p-6" data-testid="challenge-form">
-          <label htmlFor="prompt" className="block mb-2 font-semibold">Prompt Payload</label>
+        <form onSubmit={handleSubmit} className="rounded-lg p-6" style={{ border: `1px solid ${theme.colors.border}`, backgroundColor: theme.colors.surface }} data-testid="challenge-form">
+          <label htmlFor="prompt" className="block mb-2 font-medieval font-semibold" style={{ color: theme.colors.text }}>Prompt Payload</label>
           <textarea
             id="prompt"
             data-testid="challenge-prompt-input"
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            className="w-full h-32 sm:h-40 p-3 bg-slate-950 border border-slate-700 rounded focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            className="w-full h-32 sm:h-40 p-3 rounded-lg focus:outline-none focus:ring-2 font-code"
+            style={{ backgroundColor: theme.colors.bg, border: '1px solid ' + theme.colors.border, color: theme.colors.text, '--tw-ring-color': theme.colors.primary }}
             placeholder="Craft your injection prompt..."
             required
           />
@@ -82,22 +90,23 @@ export default function ChallengeWorkspace({ challenge, onSubmit, onGuess }) {
             type="submit"
             data-testid="challenge-submit-button"
             disabled={submitting}
-            className="mt-4 px-5 py-2 bg-cyan-500 text-slate-950 font-semibold rounded hover:bg-cyan-400 disabled:opacity-60"
+            className="mt-4 px-5 py-2.5 font-medieval font-semibold rounded-lg transition-shadow disabled:opacity-60"
+            style={{ backgroundColor: theme.colors.primary, color: theme.colors.bg }}
           >
             {submitting ? 'Executing...' : 'Run Attack'}
           </button>
         </form>
 
-        {error && <div className="p-4 border border-amber-500/40 bg-amber-500/10 text-amber-200 rounded">{error}</div>}
+        {error && <div className="p-4 rounded-lg border font-body" style={{ borderColor: '#d4953a40', backgroundColor: '#d4953a15', color: '#d4a843' }}>{error}</div>}
 
-        <ResponseDisplay response={response} passed={passed} hint={hint} reveal={reveal} />
+        <ResponseDisplay response={response} passed={passed} hint={hint} reveal={reveal} theme={theme} />
 
         {response && passed !== true && (
-          <form onSubmit={handleGuess} className="border border-amber-500/30 bg-slate-900 rounded-lg p-6">
-            <label htmlFor="password-guess" className="block mb-2 font-semibold text-amber-300">
+          <form onSubmit={handleGuess} className="rounded-lg p-6" style={{ border: '1px solid rgba(212,149,58,0.3)', backgroundColor: theme.colors.surface }}>
+            <label htmlFor="password-guess" className="block mb-2 font-medieval font-semibold text-[#d4a843]">
               Extract the Password
             </label>
-            <p className="text-sm text-slate-400 mb-3">
+            <p className="text-sm mb-3 font-body" style={{ color: theme.colors.muted }}>
               Read the LLM response above. What is the secret password?
             </p>
             <div className="flex gap-3">
@@ -107,7 +116,8 @@ export default function ChallengeWorkspace({ challenge, onSubmit, onGuess }) {
                 type="text"
                 value={guessInput}
                 onChange={(e) => setGuessInput(e.target.value)}
-                className="flex-1 p-3 bg-slate-950 border border-slate-700 rounded focus:outline-none focus:ring-2 focus:ring-amber-500 uppercase tracking-widest font-mono"
+                className="flex-1 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d4953a] uppercase tracking-widest font-code"
+                style={{ backgroundColor: theme.colors.bg, border: '1px solid ' + theme.colors.border, color: theme.colors.text }}
                 placeholder="TYPE PASSWORD HERE"
                 required
               />
@@ -115,7 +125,7 @@ export default function ChallengeWorkspace({ challenge, onSubmit, onGuess }) {
                 type="submit"
                 data-testid="password-guess-submit"
                 disabled={guessing}
-                className="px-5 py-2 bg-amber-500 text-slate-950 font-semibold rounded hover:bg-amber-400 disabled:opacity-60"
+                className="px-5 py-2 bg-[#d4953a] text-[#1a1210] font-medieval font-semibold rounded-lg hover:bg-[#e8c547] disabled:opacity-60 transition-colors"
               >
                 {guessing ? 'Checking...' : 'Submit Guess'}
               </button>
@@ -126,7 +136,8 @@ export default function ChallengeWorkspace({ challenge, onSubmit, onGuess }) {
         {passed && reveal?.nextChallengeId && (
           <button
             onClick={() => navigate(`/challenge/${reveal.nextChallengeId}`)}
-            className="w-full py-3 bg-cyan-500 text-slate-950 font-semibold rounded hover:bg-cyan-400 text-lg"
+            className="w-full py-3 font-medieval font-semibold rounded-lg text-lg transition-shadow"
+            style={{ backgroundColor: theme.colors.primary, color: theme.colors.bg }}
           >
             Next Level &rarr;
           </button>
