@@ -1,4 +1,4 @@
-import volcanoImage from '../../assets/level-5-volcano.png';
+import volcanoImage from '../../assets/level-5-volcano.webp';
 
 export default function VolcanoBackground() {
   return (

@@ -1,4 +1,4 @@
-import mountainImage from '../../assets/level-3-mountains.png';
+import mountainImage from '../../assets/level-3-mountains.webp';
 
 export default function MountainBackground() {
   return (

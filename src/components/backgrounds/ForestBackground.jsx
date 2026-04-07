@@ -1,4 +1,4 @@
-import forestImage from '../../assets/level-2-forest.png';
+import forestImage from '../../assets/level-2-forest.webp';
 
 export default function ForestBackground() {
   return (

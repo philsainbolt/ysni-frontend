@@ -1,4 +1,4 @@
-import marshImage from '../../assets/level-4-marshes.png';
+import marshImage from '../../assets/level-4-marshes.webp';
 
 export default function MarshBackground() {
   return (

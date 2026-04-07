@@ -1,4 +1,4 @@
-import hillsImage from '../../assets/level-1-hills.png';
+import hillsImage from '../../assets/level-1-hills.webp';
 
 export default function HillsBackground() {
   return (

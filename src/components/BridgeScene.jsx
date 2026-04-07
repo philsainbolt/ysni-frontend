@@ -1,4 +1,4 @@
-import bridgeImage from '../assets/bridge-scene.png';
+import bridgeImage from '../assets/bridge-scene.webp';
 
 export default function BridgeScene() {
   return (
