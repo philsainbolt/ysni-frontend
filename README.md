@@ -4,7 +4,7 @@
 
 A 5-level prompt injection challenge app. Craft adversarial prompts, bypass LLM guardrails, and learn how prompt injection actually works -- by doing it.
 
-**Live:** https://bejewelled-snickerdoodle-e433f4.netlify.app
+**Live:** https://you-shall-not-inject.netlify.app
 
 ## Features
 
