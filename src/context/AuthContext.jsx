@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect } from 'react';
+import { authAPI } from '../services/api';
 
 export const AuthContext = createContext();
 
@@ -9,15 +10,27 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     if (token) {
-      setUser({ token });
+      authAPI.profile()
+        .then((res) => {
+          setUser(res.data.user || res.data);
+        })
+        .catch(() => {
+          localStorage.removeItem('token');
+          setToken(null);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } else {
+      setLoading(false);
     }
-    setLoading(false);
-  }, [token]);
+  }, []);
 
   const login = (userData, authToken) => {
     setUser(userData);
     setToken(authToken);
     localStorage.setItem('token', authToken);
+    setLoading(false);
   };
 
   const logout = () => {
