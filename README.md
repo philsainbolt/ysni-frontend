@@ -4,6 +4,10 @@
 
 A 5-level prompt injection challenge app. Craft adversarial prompts, bypass LLM guardrails, and learn how prompt injection actually works -- by doing it.
 
+<p align="center">
+  <img src="screenshot.png" alt="You Shall Not Inject" width="600">
+</p>
+
 **Live:** https://you-shall-not-inject.netlify.app
 
 ## Features
